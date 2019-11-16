@@ -11,3 +11,8 @@ services:
     build: ./node/
     depends_on:
       - consul
+
+  producer:
+    build: ./producer/
+    depends_on:
+      - distributed-logger
