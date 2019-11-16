@@ -13,6 +13,8 @@ import (
 	"github.com/hashicorp/consul/api"
 )
 
+//https://medium.com/@didil/building-a-simple-distributed-system-with-go-consul-39b08ffc5d2c
+
 var isLeader bool
 
 func main() {

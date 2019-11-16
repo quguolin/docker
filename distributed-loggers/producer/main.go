@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/consul/api"
 )
 
+//https://medium.com/@didil/building-a-simple-distributed-system-with-go-consul-39b08ffc5d2c
 func main() {
 	log.Printf("Starting producer\n")
 	serviceKey := "service/distributed-logger/leader"
