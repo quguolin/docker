@@ -1,5 +1,4 @@
-#  http://zhongmingmao.me/2018/10/08/kafka-install-cluster-docker/
-
+#  http://zhongmingmao.me/2018/10/08/kafka-install-cluster-docker/?nsukey=B5D8HJEkP6GDnskmE2bT%2FuVrmJll%2BIQ97tZKDyYAf573guqTCMCKpk6FM%2FWJMklf1%2FSOkx92AnCLOxqFa9iHLaQfsGgSRmZRjqEMEWWBT6y5mKVAP2hIsoLXXm6jX2glEnwTQVwyJhwXz1wbjBr2w3JM1j4qYrzcObVhS5UX9WYBhcdzeitw%2BRjL5VVRHbFotaZByqO6DNSGl8%2FGnA0iwQ%3D%3D
 version: '2'
 services:
   zk1:
@@ -52,54 +51,56 @@ services:
     hostname: kafka1
     container_name: kafka1
     restart: always
-    depends_on:
-      - zk1
-      - zk2
-      - zk3
-    environment:
-      KAFKA_BROKER_ID: 1 #kafka的broker.id，区分不同broker
-      KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:9092 #绑定发布订阅的端口
-
-  kafka2:
-    image: confluentinc/cp-kafka:latest
-    hostname: kafka2
-    container_name: kafka2
-    restart: always
-    depends_on:
-      - zk1
-      - zk2
-      - zk3
-    environment:
-      KAFKA_BROKER_ID: 2
-      KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka2:9092
-
-  kafka3:
-    image: confluentinc/cp-kafka:latest
-    hostname: kafka3
-    container_name: kafka3
-    restart: always
-    depends_on:
-      - zk1
-      - zk2
-      - zk3
-    environment:
-      KAFKA_BROKER_ID: 3
-      KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka3:9092
-
-  kafka_manager:
-    image: hlebalbau/kafka-manager:latest
-    hostname: kafka_manager
-    container_name: kafka_manager
-    restart: always
     ports:
-      - "9000:9000"
+      - "9092:9092"
+    depends_on:
+      - zk1
+      - zk2
+      - zk3
     environment:
-      ZK_HOSTS: "zk1:2181,zk2:2181,zk3:2181"
-      APPLICATION_SECRET: "random-secret"
-      KAFKA_MANAGER_AUTH_ENABLED: "true"
-      KAFKA_MANAGER_USERNAME: zhongmingmao
-      KAFKA_MANAGER_PASSWORD: zhongmingmao
-    command: -Dpidfile.path=/dev/null
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:9092
+
+#  kafka2:
+#    image: confluentinc/cp-kafka:latest
+#    hostname: kafka2
+#    container_name: kafka2
+#    restart: always
+#    depends_on:
+#      - zk1
+#      - zk2
+#      - zk3
+#    environment:
+#      KAFKA_BROKER_ID: 2
+#      KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka2:9092
+#
+#  kafka3:
+#    image: confluentinc/cp-kafka:latest
+#    hostname: kafka3
+#    container_name: kafka3
+#    restart: always
+#    depends_on:
+#      - zk1
+#      - zk2
+#      - zk3
+#    environment:
+#      KAFKA_BROKER_ID: 3
+#      KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka3:9092
+#
+#  kafka_manager:
+#    image: hlebalbau/kafka-manager:latest
+#    hostname: kafka_manager
+#    container_name: kafka_manager
+#    restart: always
+#    ports:
+#      - "9000:9000"
+#    environment:
+#      ZK_HOSTS: "zk1:2181,zk2:2181,zk3:2181"
+#      APPLICATION_SECRET: "random-secret"
+#      KAFKA_MANAGER_AUTH_ENABLED: "true"
+#      KAFKA_MANAGER_USERNAME: zhongmingmao
+#      KAFKA_MANAGER_PASSWORD: zhongmingmao
+#    command: -Dpidfile.path=/dev/null
