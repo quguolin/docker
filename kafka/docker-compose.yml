@@ -62,34 +62,38 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:9092
 
-#  kafka2:
-#    image: confluentinc/cp-kafka:latest
-#    hostname: kafka2
-#    container_name: kafka2
-#    restart: always
-#    depends_on:
-#      - zk1
-#      - zk2
-#      - zk3
-#    environment:
-#      KAFKA_BROKER_ID: 2
-#      KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
-#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka2:9092
-#
-#  kafka3:
-#    image: confluentinc/cp-kafka:latest
-#    hostname: kafka3
-#    container_name: kafka3
-#    restart: always
-#    depends_on:
-#      - zk1
-#      - zk2
-#      - zk3
-#    environment:
-#      KAFKA_BROKER_ID: 3
-#      KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
-#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka3:9092
-#
+  kafka2:
+    image: confluentinc/cp-kafka:latest
+    hostname: kafka2
+    container_name: kafka2
+    restart: always
+    ports:
+      - "9093:9093"
+    depends_on:
+      - zk1
+      - zk2
+      - zk3
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka2:9093
+
+  kafka3:
+    image: confluentinc/cp-kafka:latest
+    hostname: kafka3
+    container_name: kafka3
+    restart: always
+    ports:
+      - "9094:9094"
+    depends_on:
+      - zk1
+      - zk2
+      - zk3
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka3:9094
+
 #  kafka_manager:
 #    image: hlebalbau/kafka-manager:latest
 #    hostname: kafka_manager
