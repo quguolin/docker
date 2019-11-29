@@ -17,7 +17,7 @@ const (
 )
 
 var (
-	topic = flag.String("t", "test2", "kafka topic")
+	topic = flag.String("t", "test_kafka", "kafka topic")
 	group = flag.String("g", "test-group", "kafka consumer group")
 )
 
