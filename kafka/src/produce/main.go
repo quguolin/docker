@@ -3,10 +3,10 @@ package main
 //https://medium.com/rahasak/kafka-producer-with-golang-fab7348a5f9a
 
 import (
-	"bufio"
 	"context"
 	"fmt"
-	"os"
+	"strconv"
+	"time"
 
 	"github.com/segmentio/kafka-go"
 )
@@ -22,16 +22,16 @@ var brokerAddrs = []string{kafkaConn1, kafkaConn2, kafkaConn3}
 
 func main() {
 	// read command line input
-	reader := bufio.NewReader(os.Stdin)
+	//reader := bufio.NewReader(os.Stdin)
 	writer := newKafkaWriter(brokerAddrs, topic)
 	defer writer.Close()
 	for {
-		fmt.Print("Enter msg: ")
-		msgStr, _ := reader.ReadString('\n')
-
+		//fmt.Print("Enter msg: ")
+		time.Sleep(time.Second)
 		msg := kafka.Message{
-			Value: []byte(msgStr),
+			Value: []byte(strconv.FormatInt(time.Now().Unix(), 10)),
 		}
+		fmt.Println("msg is ", string(msg.Value))
 		err := writer.WriteMessages(context.Background(), msg)
 		if err != nil {
 			fmt.Println(err)
