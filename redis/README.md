@@ -17,6 +17,7 @@
 
 ## 4.创建grafana展示数据
 - volumes 用于将grafana的配置和收集到的数据 映射到本地目录
+- 模板链接 https://grafana.com/grafana/dashboards/763
 
 ## 5.完整代码
 ```
