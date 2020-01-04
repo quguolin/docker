@@ -1,8 +1,5 @@
 ## 1.创建docker网络
- ```
-networks:
-  redisnet:
-```   
+- networks: redisnet
 
 ## 1.创建3台redis 
 - 镜像redis:latest 
@@ -122,3 +119,6 @@ services:
 networks:
   redisnet:
 ```
+
+## 6.git源码
+    https://github.com/quguolin/docker/tree/master/redis
