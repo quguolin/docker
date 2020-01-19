@@ -1,5 +1,17 @@
 version: '2'
 services:
+  app:
+    build: ./app/
+    ports:
+      - "8080:8080"
+    networks:
+      - prometheus
+    hostname: app
+    container_name: app
+    depends_on:
+      - prometheus
+      - grafana
+
   prometheus:
     image: prom/prometheus:latest
     volumes:
@@ -7,18 +19,18 @@ services:
     ports:
       - '9090:9090'
     networks:
-      - front_default
-    hostname: test1
-    container_name: test1
+      - prometheus
+    hostname: prometheus
+    container_name: prometheus
 
   node-exporter:
     image: prom/node-exporter:latest
     ports:
       - '9100:9100'
     networks:
-      - front_default
-    hostname: test2
-    container_name: test2
+      - prometheus
+    hostname: node-exporter
+    container_name: node-exporter
 
   grafana:
     image: grafana/grafana:latest
@@ -29,17 +41,9 @@ services:
     ports:
       - "3000:3000"
     networks:
-      - front_default
-    hostname: test3
-    container_name: test3
+      - prometheus
+    hostname: grafana
+    container_name: grafana
 
 networks:
-  front_default:
-#  app:
-#  app:
-#    build: ./app/
-#    ports:
-#      - "3001:3001"
-#    depends_on:
-#      - prometheus
-#      - grafana
+  prometheus:
