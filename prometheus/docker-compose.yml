@@ -36,7 +36,7 @@ services:
   grafana:
     image: grafana/grafana:latest
     volumes:
-      - grafana-storage:/var/lib/grafana
+      - ./grafana:/var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     depends_on:
@@ -50,6 +50,3 @@ services:
 
 networks:
   prometheus:
-
-volumes:
-  grafana-storage:
