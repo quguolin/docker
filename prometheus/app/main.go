@@ -1,69 +1,73 @@
 package main
 
 import (
+	"net/http"
+	"os"
+	"os/signal"
+	"strconv"
+	"syscall"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var (
-	GaugeVecApiDuration = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "apiDuration",
-		Help: "api耗时单位ms",
-	}, []string{"WSorAPI"})
-	GaugeVecApiMethod = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "apiCount",
-		Help: "各种网络请求次数",
-	}, []string{"method"})
-	GaugeVecApiError = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "apiErrorCount",
-		Help: "请求api错误的次数type: api/ws",
-	}, []string{"type"})
+	MetricServerReqDur = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Namespace: serverNamespace,
+			Subsystem: "requests",
+			Name:      "duration_ms",
+			Help:      "http server requests duration(ms).",
+			Buckets:   []float64{5, 10, 25, 50, 100, 250, 500, 1000},
+		},
+		[]string{"path", "caller"},
+	)
+	MetricServerReqCodeTotal = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: serverNamespace,
+			Subsystem: "requests",
+			Name:      "code_total",
+			Help:      "http server requests error count.",
+		},
+		[]string{"path", "caller", "code"},
+	)
 )
 
 func init() {
-	// Register the summary and the histogram with Prometheus's default registry.
-	prometheus.MustRegister(GaugeVecApiMethod, GaugeVecApiDuration, GaugeVecApiError)
+	prometheus.MustRegister(MetricServerReqDur)
+	prometheus.MustRegister(MetricServerReqCodeTotal)
 }
 
-func MwPrometheusHttp(c *gin.Context) {
-	start := time.Now()
-	method := c.Request.Method
-	GaugeVecApiMethod.WithLabelValues(method).Inc()
-
-	c.Next()
-	// after request
-	end := time.Now()
-	d := end.Sub(start) / time.Millisecond
-	GaugeVecApiDuration.WithLabelValues(method).Set(float64(d))
-}
-
-func JsonError(c *gin.Context, msg interface{}) {
-	GaugeVecApiError.WithLabelValues("API").Inc()
-	var ms string
-	switch v := msg.(type) {
-	case string:
-		ms = v
-	case error:
-		ms = v.Error()
-	default:
-		ms = ""
-	}
-	c.JSON(200, gin.H{"ok": false, "msg": ms})
-}
+const (
+	serverNamespace = "http_server"
+)
 
 func main() {
-	// Set the router as the default one shipped with Gin
-	router := gin.Default()
-	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
-	api := router.Group("/api").Use(MwPrometheusHttp)
-	api.GET("/test", func(c *gin.Context) {
-		time.Sleep(time.Second)
-		c.JSON(200, "success")
+	http.Handle("/metrics", promhttp.Handler())
+	http.HandleFunc("/test", func(writer http.ResponseWriter, request *http.Request) {
+		MetricServerReqDur.WithLabelValues("/path", "user").Observe(float64(time.Second))
+		MetricServerReqCodeTotal.WithLabelValues("/path", "user", strconv.FormatInt(200, 10)).Inc()
+		writer.Write([]byte("hello world"))
 	})
-	if err := router.Run(":3001"); err != nil {
-		panic(err)
+	go func() {
+		err := http.ListenAndServe(":8080", nil)
+		if err != nil {
+			panic(err)
+		}
+	}()
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, syscall.SIGHUP, syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT)
+	for {
+		s := <-c
+		switch s {
+		case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
+			time.Sleep(time.Second)
+			return
+		case syscall.SIGHUP:
+			// TODO reload
+		default:
+			return
+		}
 	}
 }
