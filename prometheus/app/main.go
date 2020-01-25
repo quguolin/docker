@@ -56,7 +56,7 @@ func ListenAndServe(addr string, handler http.Handler, timeout time.Duration) er
 func main() {
 	addr := "127.0.0.1:8080"
 	http.HandleFunc("/", func(http.ResponseWriter, *http.Request) {})
-	go ListenAndServe(addr, nil, time.Second)
+	go ListenAndServe(addr, nil, 600*time.Millisecond)
 
 	http.Handle("/metrics", promhttp.Handler())
 	http.HandleFunc("/test", func(writer http.ResponseWriter, request *http.Request) {
