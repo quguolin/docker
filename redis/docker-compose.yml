@@ -1,0 +1,98 @@
+version: '3'
+
+services:
+  redis-1:
+    image: redis:latest
+    container_name: redis-1
+    hostname: redis-1
+#    ports:
+#      - "6379:6379"
+    restart: always
+    networks:
+      redisnet:
+
+  redis-2:
+    image: redis:latest
+    container_name: redis-2
+    hostname: redis-2
+#    ports:
+#      - "6380:6379"
+    restart: always
+    networks:
+      redisnet:
+
+  redis-3:
+    image: redis:latest
+    container_name: redis-3
+    hostname: redis-3
+#    ports:
+#      - "6381:6379"
+    restart: always
+    networks:
+      redisnet:
+
+  redis-exporter-1:
+    image: oliver006/redis_exporter
+    container_name: redis_exporter_1
+    hostname: redis_exporter_1
+    restart: always
+#    ports:
+#      - "9121:9121"
+    networks:
+      - redisnet
+    command:
+      - '--redis.addr=redis://redis-1:6379'
+
+  redis-exporter-2:
+    image: oliver006/redis_exporter
+    container_name: redis_exporter_2
+    hostname: redis_exporter_2
+    restart: always
+    expose:
+      - 9122
+#    ports:
+#      - "9122:9121"
+    networks:
+      - redisnet
+    command:
+      - '--redis.addr=redis://redis-2:6379'
+
+  redis-exporter-3:
+    image: oliver006/redis_exporter
+    container_name: redis_exporter_3
+    hostname: redis_exporter_3
+    restart: always
+#    ports:
+#      - "9123:9121"
+    networks:
+      - redisnet
+    command:
+      - '--redis.addr=redis://redis-3:6379'
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - '9090:9090'
+    networks:
+      - redisnet
+    hostname: prometheus
+    container_name: prometheus
+
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    networks:
+      - redisnet
+    hostname: grafana
+    container_name: grafana
+    volumes:
+      - ./grafana_data:/var/lib/grafana
+networks:
+  redisnet:

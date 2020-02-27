@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+  app:
+    build: ./app/
+    ports:
+      - "8080:8080"
+    networks:
+      - prometheus
+    hostname: app
+    container_name: app
+    depends_on:
+      - prometheus
+      - grafana
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - '9090:9090'
+    networks:
+      - prometheus
+    hostname: prometheus
+    container_name: prometheus
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    ports:
+      - '9100:9100'
+    networks:
+      - prometheus
+    hostname: node-exporter
+    container_name: node-exporter
+
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - ./grafana:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    networks:
+      - prometheus
+    hostname: grafana
+    container_name: grafana
+
+networks:
+  prometheus:
