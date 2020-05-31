@@ -1,14 +1,20 @@
-version: '3.3'
+version: '2'
 services:
-  db:
-    image: mysql:5.7
-    restart: always
+  mysql:
+    container_name: mysql
+    image: mariadb:10.4.1
     environment:
-      MYSQL_DATABASE: 'test'
-      MYSQL_USER: 'test'
-      MYSQL_PASSWORD: 'test'
-      MYSQL_ROOT_PASSWORD: 'test'
-    ports:
-      - '3306:3306'
+      #最好使用此设定时区，其它静像也可以使用
+      - TZ=CST-8
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=self_bridge
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=my_data
+      - MYSQL_USER=my_user
+      - MYSQL_PASSWORD=my_pw
+    #可以加--default-time-zone='+8:00'设定时区
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
-      - /data/docker/mysql:/var/lib/mysql
+      #本地文件目录
+      - /data/mysql/data:/var/lib/mysql
+    ports:
+      - 3306:3306
